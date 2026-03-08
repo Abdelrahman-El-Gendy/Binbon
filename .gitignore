@@ -1,0 +1,52 @@
+# ─── Build outputs ─────────────────────────────────────────────────────────
+/build/
+app/build/
+**/build/
+
+# ─── Local configuration (machine-specific, contains SDK path) ─────────────
+local.properties
+
+# ─── Gradle ────────────────────────────────────────────────────────────────
+.gradle/
+**/.gradle/
+
+# ─── Android Studio / IntelliJ IDEA ────────────────────────────────────────
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# ─── Kotlin / KSP generated sources ────────────────────────────────────────
+**/generated/
+
+# ─── Signing keystores & secrets (never commit these) ──────────────────────
+*.jks
+*.keystore
+keystore.properties
+secrets.properties
+
+# ─── OS-generated junk ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Captured data / profiling ─────────────────────────────────────────────
+captures/
+*.hprof
+
+# ─── External native build ─────────────────────────────────────────────────
+.externalNativeBuild/
+.cxx/
+
+# ─── Lint ──────────────────────────────────────────────────────────────────
+lint/
+lint-results*.xml
+lint-results*.html
+
+# ─── Test results ──────────────────────────────────────────────────────────
+test-results/
+**/TEST-*.xml
+
+# ─── Navigation safe-args generated (if used) ──────────────────────────────
+app/src/debug/
+app/src/release/
