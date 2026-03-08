@@ -9,6 +9,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.media3.common.Player
 import com.binbon.app.domain.model.Video
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun VideoFeedList(
@@ -28,6 +29,7 @@ fun VideoFeedList(
     // Listen for page changes to switch video
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }
+            .distinctUntilChanged()
             .collect { page ->
                 onVideoChanged(page)
             }
@@ -38,10 +40,12 @@ fun VideoFeedList(
         modifier = modifier.fillMaxSize(),
         beyondViewportPageCount = 1
     ) { page ->
+        val isCurrentPage = pagerState.settledPage == page
         VideoFeedItem(
             video = videos[page],
             player = player,
-            isPlaying = isPlaying && pagerState.settledPage == page,
+            isPlaying = isPlaying && isCurrentPage,
+            isCurrentPage = isCurrentPage,
             onTogglePlayPause = onTogglePlayPause,
             onLikeClick = { onLikeClick(videos[page].id) }
         )

@@ -20,11 +20,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.binbon.app.domain.model.Video
 
+import androidx.compose.material3.MaterialTheme
+import com.binbon.app.ui.theme.Dimens
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
+
 @Composable
 fun VideoMetadataOverlay(
     video: Video,
     modifier: Modifier = Modifier
 ) {
+    val textShadow = Shadow(
+        color = MaterialTheme.colorScheme.background.copy(alpha = 0.8f),
+        offset = Offset(1f, 1f),
+        blurRadius = 4f
+    )
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Bottom
@@ -35,22 +46,26 @@ fun VideoMetadataOverlay(
         ) {
             Text(
                 text = "@${video.username}",
-                color = Color.White,
-                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    shadow = textShadow
+                ),
                 fontWeight = FontWeight.Bold
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(Dimens.paddingSmall))
 
         // Description
         Text(
             text = video.description,
-            color = Color.White.copy(alpha = 0.9f),
-            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                shadow = textShadow,
+                lineHeight = 20.sp
+            ),
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            lineHeight = 20.sp
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

@@ -13,8 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +30,7 @@ import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import com.binbon.app.core.extensions.noRippleClickable
 import com.binbon.app.domain.model.Video
+import com.binbon.app.ui.theme.Dimens
 import kotlinx.coroutines.delay
 
 @Composable
@@ -37,6 +38,7 @@ fun VideoFeedItem(
     video: Video,
     player: Player,
     isPlaying: Boolean,
+    isCurrentPage: Boolean,
     onTogglePlayPause: () -> Unit,
     onLikeClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -59,17 +61,17 @@ fun VideoFeedItem(
                 showPauseIcon = true
             }
     ) {
-        // Video Player Surface
+        // Video Player Surface — only attach player to the currently visible page
         AndroidView(
             factory = { context ->
                 PlayerView(context).apply {
-                    this.player = player
                     useController = false
-                    setShowBuffering(PlayerView.SHOW_BUFFERING_NEVER)
+                    setShowBuffering(PlayerView.SHOW_BUFFERING_WHEN_PLAYING)
                 }
             },
             update = { playerView ->
-                playerView.player = player
+                // Only bind the player to the page that is currently settled/visible
+                playerView.player = if (isCurrentPage) player else null
             },
             modifier = Modifier.fillMaxSize()
         )
@@ -83,8 +85,8 @@ fun VideoFeedItem(
                         colors = listOf(
                             Color.Transparent,
                             Color.Transparent,
-                            Color.Black.copy(alpha = 0.3f),
-                            Color.Black.copy(alpha = 0.6f)
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.3f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.8f)
                         )
                     )
                 )
@@ -101,7 +103,7 @@ fun VideoFeedItem(
                 modifier = Modifier
                     .size(72.dp)
                     .background(
-                        color = Color.Black.copy(alpha = 0.4f),
+                        color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -109,8 +111,8 @@ fun VideoFeedItem(
                 Icon(
                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                     contentDescription = if (isPlaying) "Pause" else "Play",
-                    tint = Color.White,
-                    modifier = Modifier.size(40.dp)
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(Dimens.iconSizeLarge)
                 )
             }
         }
@@ -124,7 +126,7 @@ fun VideoFeedItem(
             onLikeClick = onLikeClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 12.dp, bottom = 100.dp)
+                .padding(end = Dimens.paddingMedium, bottom = 100.dp)
         )
 
         // Metadata overlay (bottom-left)
@@ -132,7 +134,7 @@ fun VideoFeedItem(
             video = video,
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = 100.dp, end = 80.dp)
+                .padding(start = Dimens.paddingMedium, bottom = 100.dp, end = 80.dp)
         )
     }
 }

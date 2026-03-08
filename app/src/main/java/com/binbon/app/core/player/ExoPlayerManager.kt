@@ -15,6 +15,7 @@ class ExoPlayerManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private var _player: ExoPlayer? = null
+    private var currentUrl: String? = null
 
     val player: ExoPlayer
         get() = _player ?: createPlayer().also { _player = it }
@@ -30,7 +31,12 @@ class ExoPlayerManager @Inject constructor(
     }
 
     fun play(url: String) {
+        // Skip if already playing this exact URL
+        if (url == currentUrl && _player?.isPlaying == true) return
+
+        currentUrl = url
         player.apply {
+            stop()
             setMediaItem(MediaItem.fromUri(url))
             prepare()
             playWhenReady = true
@@ -57,5 +63,6 @@ class ExoPlayerManager @Inject constructor(
     fun release() {
         _player?.release()
         _player = null
+        currentUrl = null
     }
 }

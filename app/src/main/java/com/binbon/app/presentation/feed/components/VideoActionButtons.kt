@@ -30,6 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.compose.material3.MaterialTheme
+import com.binbon.app.ui.theme.Dimens
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
+
 @Composable
 fun VideoActionButtons(
     likes: Int,
@@ -42,7 +47,7 @@ fun VideoActionButtons(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimens.paddingMedium)
     ) {
         // Like button with animation
         val likeScale by animateFloatAsState(
@@ -57,7 +62,7 @@ fun VideoActionButtons(
         ActionButton(
             icon = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
             count = formatCount(likes),
-            tint = if (isLiked) Color(0xFFFF2D55) else Color.White,
+            tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
             onClick = onLikeClick,
             modifier = Modifier.scale(likeScale)
         )
@@ -66,7 +71,7 @@ fun VideoActionButtons(
         ActionButton(
             icon = Icons.Filled.ChatBubble,
             count = formatCount(comments),
-            tint = Color.White,
+            tint = MaterialTheme.colorScheme.onBackground,
             onClick = { /* TODO: open comments */ }
         )
 
@@ -74,11 +79,12 @@ fun VideoActionButtons(
         ActionButton(
             icon = Icons.Filled.Share,
             count = formatCount(shares),
-            tint = Color.White,
+            tint = MaterialTheme.colorScheme.onBackground,
             onClick = { /* TODO: share */ }
         )
     }
 }
+
 
 @Composable
 private fun ActionButton(
@@ -88,25 +94,33 @@ private fun ActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val textShadow = Shadow(
+        color = MaterialTheme.colorScheme.background.copy(alpha = 0.8f),
+        offset = Offset(1f, 1f),
+        blurRadius = 4f
+    )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         IconButton(
             onClick = onClick,
-            modifier = modifier.size(44.dp)
+            modifier = modifier.size(Dimens.actionButtonSize)
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = tint,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(Dimens.iconSizeMedium)
             )
         }
         Text(
             text = count,
-            color = Color.White,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.labelLarge.copy(
+                shadow = textShadow,
+                fontWeight = FontWeight.SemiBold
+            )
         )
     }
 }
