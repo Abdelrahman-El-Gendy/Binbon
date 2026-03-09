@@ -14,20 +14,21 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.Player
+import com.binbon.app.domain.model.Video
 import com.binbon.app.presentation.feed.components.VideoFeedList
-
-import androidx.compose.material3.MaterialTheme
+import com.binbon.app.ui.theme.BinbonTheme
 import com.binbon.app.ui.theme.Dimens
 
 @Composable
@@ -36,8 +37,22 @@ fun FeedScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    FeedScreenContent(
+        uiState = uiState,
+        player = viewModel.playerManager.player,
+        onIntent = viewModel::handleIntent
+    )
+}
+
+@Composable
+fun FeedScreenContent(
+    uiState: FeedUiState,
+    player: Player?,
+    onIntent: (FeedIntent) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
@@ -52,7 +67,9 @@ fun FeedScreen(
 
             uiState.error != null -> {
                 Column(
-                    modifier = Modifier.align(Alignment.Center).padding(Dimens.paddingLarge),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(Dimens.paddingLarge),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
@@ -63,13 +80,13 @@ fun FeedScreen(
                     )
                     Spacer(modifier = Modifier.height(Dimens.paddingMedium))
                     Text(
-                        text = uiState.error ?: "Something went wrong",
+                        text = uiState.error,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Spacer(modifier = Modifier.height(Dimens.paddingMedium))
                     Button(
-                        onClick = { viewModel.handleIntent(FeedIntent.LoadFeed) },
+                        onClick = { onIntent(FeedIntent.LoadFeed) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
@@ -86,19 +103,78 @@ fun FeedScreen(
             uiState.videos.isNotEmpty() -> {
                 VideoFeedList(
                     videos = uiState.videos,
-                    player = viewModel.playerManager.player,
+                    player = player,
                     isPlaying = uiState.isPlaying,
                     onVideoChanged = { index ->
-                        viewModel.handleIntent(FeedIntent.OnVideoChanged(index))
+                        onIntent(FeedIntent.OnVideoChanged(index))
                     },
                     onTogglePlayPause = {
-                        viewModel.handleIntent(FeedIntent.TogglePlayPause)
+                        onIntent(FeedIntent.TogglePlayPause)
                     },
                     onLikeClick = { videoId ->
-                        viewModel.handleIntent(FeedIntent.OnLikeClicked(videoId))
+                        onIntent(FeedIntent.OnLikeClicked(videoId))
                     }
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FeedScreenPreview() {
+    BinbonTheme {
+        FeedScreenContent(
+            uiState = FeedUiState(
+                videos = listOf(
+                    Video(
+                        id = 1,
+                        videoUrl = "",
+                        username = "adventure_seeker",
+                        description = "Blazing through the weekend 🔥 #adventure #fire",
+                        likes = 14200,
+                        comments = 892,
+                        shares = 340,
+                        isLiked = false
+                    ),
+                    Video(
+                        id = 2,
+                        videoUrl = "",
+                        username = "travel_vibes",
+                        description = "When you need a bigger escape ✈️ #travel #explore",
+                        likes = 28500,
+                        comments = 1540,
+                        shares = 720,
+                        isLiked = true
+                    )
+                )
+            ),
+            player = null,
+            onIntent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FeedScreenLoadingPreview() {
+    BinbonTheme {
+        FeedScreenContent(
+            uiState = FeedUiState(isLoading = true),
+            player = null,
+            onIntent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FeedScreenErrorPreview() {
+    BinbonTheme {
+        FeedScreenContent(
+            uiState = FeedUiState(error = "Unable to load feed. Please check your connection."),
+            player = null,
+            onIntent = {}
+        )
     }
 }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Composable
 fun VideoFeedList(
     videos: List<Video>,
-    player: Player,
+    player: Player?,
     isPlaying: Boolean,
     onVideoChanged: (Int) -> Unit,
     onTogglePlayPause: () -> Unit,

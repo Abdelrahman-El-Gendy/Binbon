@@ -36,7 +36,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun VideoFeedItem(
     video: Video,
-    player: Player,
+    player: Player?,
     isPlaying: Boolean,
     isCurrentPage: Boolean,
     onTogglePlayPause: () -> Unit,
